@@ -12,6 +12,7 @@
 class ANixProjectile;
 class UInputMappingContext;
 class UInputAction;
+class UCapsuleComponent;
 struct FInputActionValue;
 
 UCLASS()
@@ -33,6 +34,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
@@ -47,6 +51,16 @@ protected:
 	void InputShoot(const FInputActionValue& InputActionValue);
 	
 	void InputRotateProjectile(const FInputActionValue& InputActionValue);
+	
+	void InputTraceLine(const FInputActionValue& InputActionValue);
+	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse, const FHitResult& Hit);
+	
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 private:
 	TObjectPtr<ANixProjectile> LastProjectile;
@@ -72,6 +86,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> InputActionRotateProjectile;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> InputActionTraceLine;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ANixProjectile> ProjectileClass;
