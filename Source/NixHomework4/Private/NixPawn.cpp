@@ -4,8 +4,10 @@
 #include "NixHomework4/Public/NixPawn.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "NixLightActor.h"
 #include "NixProjectile.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -80,12 +82,18 @@ void ANixPawn::InputLook(const FInputActionValue& InputActionValue)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
-void ANixPawn::InputScale(const FInputActionValue& InputActionValue)
+void ANixPawn::InputChangeColor(const FInputActionValue& InputActionValue)
 {
-	float ScaleValue = InputActionValue.Get<float>() * SCALE_MULTIPLIER;
-	float NewScale = FMath::Clamp(ScaleValue + GetActorScale().X, 0.25, 2.0);
-	
-	SetActorScale3D(FVector3d(NewScale, NewScale, NewScale));
+	if (InputActionValue.Get<bool>())
+	{
+		TArray<AActor*> InteractableActors;
+		UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UNixInteractionInterfce::StaticClass(),
+			InteractableActors);
+		for (auto Actor: InteractableActors)
+		{
+			INixInteractionInterfce::Execute_OnInteract(Actor);
+		}
+	}
 }
 
 void ANixPawn::InputShoot(const FInputActionValue& InputActionValue)
@@ -110,13 +118,11 @@ void ANixPawn::InputShoot(const FInputActionValue& InputActionValue)
 	}
 }
 
-void ANixPawn::InputRotateProjectile(const FInputActionValue& InputActionValue)
+void ANixPawn::InputDestroy(const FInputActionValue& InputActionValue)
 {
-	bool RotateValue = InputActionValue.Get<bool>();
-	
-	if (RotateValue && LastProjectile)
+	if (InputActionValue.Get<bool>())
 	{
-		LastProjectile->AddActorLocalRotation(FRotator(5.f, 0.f, 0.f));
+		DestoryActorsDelegate.Broadcast();
 	}
 }
 
@@ -196,9 +202,9 @@ void ANixPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(InputActionMove, ETriggerEvent::Triggered, this, &ThisClass::InputMove);
 		Input->BindAction(InputActionZoom, ETriggerEvent::Triggered, this, &ThisClass::InputZoom);
 		Input->BindAction(InputActionLook, ETriggerEvent::Triggered, this, &ThisClass::InputLook);
-		Input->BindAction(InputActionScale, ETriggerEvent::Triggered, this, &ThisClass::InputScale);
+		Input->BindAction(InputActionChangeColor, ETriggerEvent::Triggered, this, &ThisClass::InputChangeColor);
 		Input->BindAction(InputActionShoot, ETriggerEvent::Triggered, this, &ThisClass::InputShoot);
-		Input->BindAction(InputActionRotateProjectile, ETriggerEvent::Triggered, this, &ThisClass::InputRotateProjectile);
+		Input->BindAction(InputActionDestroy, ETriggerEvent::Triggered, this, &ThisClass::InputDestroy);
 		Input->BindAction(InputActionTraceLine, ETriggerEvent::Triggered, this, &ThisClass::InputTraceLine);
 	}
 }

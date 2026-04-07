@@ -15,6 +15,8 @@ class UInputAction;
 class UCapsuleComponent;
 struct FInputActionValue;
 
+DECLARE_MULTICAST_DELEGATE(FDestoryActorsDelegate);
+
 UCLASS()
 class NIXHOMEWORK4_API ANixPawn : public APawn
 {
@@ -46,11 +48,11 @@ protected:
 
 	void InputLook(const FInputActionValue& InputActionValue);
 	
-	void InputScale(const FInputActionValue& InputActionValue);
+	void InputChangeColor(const FInputActionValue& InputActionValue);
 	
 	void InputShoot(const FInputActionValue& InputActionValue);
 	
-	void InputRotateProjectile(const FInputActionValue& InputActionValue);
+	void InputDestroy(const FInputActionValue& InputActionValue);
 	
 	void InputTraceLine(const FInputActionValue& InputActionValue);
 	
@@ -79,19 +81,21 @@ public:
 	TObjectPtr<UInputAction> InputActionLook;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> InputActionScale;
+	TObjectPtr<UInputAction> InputActionChangeColor;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> InputActionShoot;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> InputActionRotateProjectile;
+	TObjectPtr<UInputAction> InputActionDestroy;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> InputActionTraceLine;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ANixProjectile> ProjectileClass;
+	
+	FDestoryActorsDelegate DestoryActorsDelegate; 
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
