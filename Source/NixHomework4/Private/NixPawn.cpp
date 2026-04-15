@@ -4,11 +4,12 @@
 #include "NixHomework4/Public/NixPawn.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "NixGameModeBase.h"
 #include "NixLightActor.h"
 #include "NixProjectile.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 
 #define SCALE_MULTIPLIER 0.01
@@ -36,6 +37,9 @@ ANixPawn::ANixPawn() : LastProjectile(nullptr)
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+	
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+	WidgetComponent->SetupAttachment(StaticMeshComponent);
 }
 
 // Called when the game starts or when spawned
@@ -53,6 +57,10 @@ void ANixPawn::BeginPlay()
 	
 	CapsuleComponent->OnComponentHit.AddDynamic(this, &ANixPawn::OnHit);
 	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ANixPawn::OnBeginOverlap);
+	
+	ANixGameModeBase* GameMode = Cast<ANixGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	ensure (GameMode);
+	GameMode->RegisterPawn(this);
 }
 
 void ANixPawn::InputMove(const FInputActionValue& InputActionValue)
@@ -98,7 +106,7 @@ void ANixPawn::InputChangeColor(const FInputActionValue& InputActionValue)
 
 void ANixPawn::InputShoot(const FInputActionValue& InputActionValue)
 {
-	bool ShootValue = InputActionValue.Get<bool>();
+ 	bool ShootValue = InputActionValue.Get<bool>();
 	
 	if (ShootValue && ProjectileClass)
 	{
@@ -168,6 +176,14 @@ void ANixPawn::InputTraceLine(const FInputActionValue& InputActionValue)
 	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 2.0f, 0, 2.0f);
 }
 
+void ANixPawn::InputPause(const FInputActionValue& InputActionValue)
+{
+	if (InputActionValue.Get<bool>())
+	{
+		ShowPauseMenuDelegate.Broadcast();
+	}
+}
+
 void ANixPawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                      FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -192,6 +208,22 @@ void ANixPawn::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	}
 }
 
+void ANixPawn::SetupName_Implementation(const FText& Name)
+{
+	PlayerName = Name;
+	OnNameSetup.Broadcast(Name);
+}
+
+void ANixPawn::ToggleShowName_Implementation(bool bShow)
+{
+	bShowName = bShow;
+}
+
+void ANixPawn::UpdatePlayerNameVisibility(bool bForceHide) const
+{
+	WidgetComponent->SetVisibility(bShowName && !bForceHide);
+}
+
 // Called to bind functionality to input
 void ANixPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -206,6 +238,7 @@ void ANixPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(InputActionShoot, ETriggerEvent::Triggered, this, &ThisClass::InputShoot);
 		Input->BindAction(InputActionDestroy, ETriggerEvent::Triggered, this, &ThisClass::InputDestroy);
 		Input->BindAction(InputActionTraceLine, ETriggerEvent::Triggered, this, &ThisClass::InputTraceLine);
+		Input->BindAction(InputActionPause, ETriggerEvent::Triggered, this, &ThisClass::InputPause);
 	}
 }
 
