@@ -32,4 +32,13 @@ protected:
 	
 	UFUNCTION()
 	void OnHidePauseMenuCallback();
+
+	UFUNCTION()
+	void OnExitGameCallback();
+
+	UFUNCTION()
+	void OnPlayerNameChangedCallback(const FText& Name);
+
+	UFUNCTION()
+	void OnShowPlayerName(bool bShow);
 };

@@ -7,7 +7,9 @@
 #include "NixPauseMenuWidget.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE(FHidePauseMenuDelegate);
+class UButton;
+class UWidgetSwitcher;
+
 
 /**
  * 
@@ -18,14 +20,23 @@ class NIXHOMEWORK4_API UNixPauseMenuWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	FHidePauseMenuDelegate HidePauseMenuDelegate;
+	void NativeConstruct();
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* MainMenuButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* SettingsMenuButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* WidgetSwitcher;
 	
-	UFUNCTION(BlueprintCallable)
-	void ContinueGame() const;
-	
-	UFUNCTION(BlueprintCallable)
-	void ExitGame() const;
-	
-	UFUNCTION(BlueprintImplementableEvent)
 	void Init();
+
+protected:
+	UFUNCTION()
+	void OnMainMenuButtonClicked();
+
+	UFUNCTION()
+	void OnSettingsMenuButtonClicked();
 };
