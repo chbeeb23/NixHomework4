@@ -17,7 +17,7 @@ class NIXHOMEWORK4_API UNixMainMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void NativeConstruct();
+	void NativeOnInitialized();
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* ContinueButton;

@@ -18,7 +18,7 @@ class NIXHOMEWORK4_API UNixSettingsMenuWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void NativeConstruct();
+	void NativeOnInitialized();
 
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* PlayerNameTextBox;

@@ -20,7 +20,7 @@ class NIXHOMEWORK4_API UNixPauseMenuWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void NativeConstruct();
+	void NativeOnInitialized();
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* MainMenuButton;

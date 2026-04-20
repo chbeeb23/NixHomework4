@@ -5,9 +5,9 @@
 #include "Components/Button.h"
 #include <NixPlayerController.h>
 
-void UNixMainMenuWidget::NativeConstruct()
+void UNixMainMenuWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	if (ContinueButton)
 	{

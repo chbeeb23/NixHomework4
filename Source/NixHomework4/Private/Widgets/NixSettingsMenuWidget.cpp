@@ -6,9 +6,9 @@
 #include <NixPlayerController.h>
 #include "Components/CheckBox.h"
 
-void UNixSettingsMenuWidget::NativeConstruct()
+void UNixSettingsMenuWidget::NativeOnInitialized()
 {
-    Super::NativeConstruct();
+    Super::NativeOnInitialized();
 
     if (PlayerNameTextBox)
     {

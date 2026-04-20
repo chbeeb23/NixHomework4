@@ -6,9 +6,9 @@
 #include "Components/WidgetSwitcher.h"
 
 
-void UNixPauseMenuWidget::NativeConstruct()
+void UNixPauseMenuWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	if (MainMenuButton)
 	{
